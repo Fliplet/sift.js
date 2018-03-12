@@ -54,13 +54,15 @@
     }
 
     if (typeof value === 'string') {
-      result = parseFloat(value.replace(/[^0-9,\.-]+/, ''));
-    }
-
-    if (isNaN(result)) {
       // Try to parse is as a Date
-      var date = new Date(value);
-      result = date.getTime();
+      var validDateFormat = /([0-9]{2,4})([-.])([0-9]{2})\2([0-9]{2,4})/;
+      if (value.match(validDateFormat)) {
+        var date = new Date(value);
+        return result = date.getTime();
+      }
+
+      // Try to parse float
+      result = parseFloat(value.replace(/[^0-9,\.-]+/, ''));
     }
 
     return result;
