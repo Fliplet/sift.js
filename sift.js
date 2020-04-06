@@ -1,12 +1,14 @@
 /*
- * Sift 3.x
+ * Sift 3.x	
+ *	
+ * Copryright 2015, Craig Condon	
+ * Licensed under MIT	
+ *	
+ * Filter JavaScript objects with mongodb queries	
  *
- * Copryright 2015, Craig Condon
- * Licensed under MIT
- *
- * Filter JavaScript objects with mongodb queries
+ * The fork of this library is maintained by Fliplet
+ * https://github.com/Fliplet/sift.js
  */
-
 (function() {
 
   'use strict';
@@ -41,6 +43,46 @@
   }
 
   /**
+   * Added by Fliplet
+   * https://stackoverflow.com/questions/1068834/object-comparison-in-javascript
+   */
+  function compareObjects(x, y) {
+    if (x === y) return true;
+    // if both x and y are null or undefined and exactly the same
+
+    if (!(x instanceof Object) || !(y instanceof Object)) return false;
+    // if they are not strictly equal, they both need to be Objects
+
+    if (x.constructor !== y.constructor) return false;
+    // they must have the exact same prototype chain, the closest we can do is
+    // test there constructor.
+
+    for (var p in x) {
+      if (!x.hasOwnProperty(p)) continue;
+      // other properties were tested using x.constructor === y.constructor
+
+      if (!y.hasOwnProperty(p)) return false;
+      // allows to compare x[ p ] and y[ p ] when set to undefined
+
+      if (x[p] === y[p]) continue;
+      // if they have the same strict value or identity then they are equal
+
+      if (typeof x[p] !== "object") return false;
+      // Numbers, Strings, Functions, Booleans must be strictly equal
+
+      if (!Object.equals(x[p], y[p])) return false;
+      // Objects and Arrays must be tested recursively
+    }
+
+    for (p in y) {
+      if (y.hasOwnProperty(p) && !x.hasOwnProperty(p)) return false;
+      // allows x[ p ] to be set to undefined
+    }
+    return true;
+  }
+
+
+  /**
    * Given a value, most of the times would be a string try to return
    * a value to compare. It will work for things like:
    * "-$1", "01-01-2018", "1 dollar"
@@ -69,7 +111,7 @@
   }
 
   function isComparable(a, b) {
-    return !(isNaN(a) && isNaN(b));;
+    return !(isNaN(a) && isNaN(b));
   }
 
   function get(obj, key) {
@@ -117,6 +159,14 @@
 
     $eq: or(function(a, b) {
       return a(b);
+    }),
+
+    $match: or(function(a, b) {
+      if (typeof a === 'object' && typeof b === 'object') {
+        return compareObjects(a, b);
+      }
+
+      return sift.compare(b, a) > 0;
     }),
 
     /**
