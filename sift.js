@@ -1,4 +1,14 @@
-// https://raw.githubusercontent.com/Fliplet/sift.js/master/sift.js
+/*
+ * Sift 3.x	
+ *	
+ * Copryright 2015, Craig Condon	
+ * Licensed under MIT	
+ *	
+ * Filter JavaScript objects with mongodb queries	
+ *
+ * The fork of this library is maintained by Fliplet
+ * https://github.com/Fliplet/sift.js
+ */
 (function() {
 
   'use strict';
